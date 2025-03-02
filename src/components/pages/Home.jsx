@@ -2,10 +2,12 @@ import React from 'react'
 import Footer from './components/Footer';
 import { FaHome, FaUsers, FaTools, FaComments, FaBell } from "react-icons/fa";
 import Contact from './components/Contact';
+import NavMenu from './components/NavMenu';
 
 function Home() {
     return (
         <>
+            <NavMenu />
             {/* Hero Section */}
             <section className="min-h-80 bg-[url(https://images.unsplash.com/photo-1729340498130-33139dac6438?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] text-white py-20">
                 <div className="max-w-4xl mx-auto text-center">
@@ -86,7 +88,7 @@ function Home() {
                 </div>
             </section>
 
-            <Contact/>
+            <Contact />
 
             {/* Call-to-Action Section */}
             <section className="bg-blue-900 text-white py-20">
