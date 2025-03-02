@@ -1,7 +1,7 @@
 import { Route, Routes, NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import Home from "./pages/Home";
+import Home from "./pages/DashboardHome";
 import Announcements from "./pages/Announcements";
 import Rooms from "./pages/Rooms";
 import Property from "./pages/Property";

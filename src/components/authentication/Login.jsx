@@ -12,8 +12,8 @@ function Login() {
         try {
             e.preventDefault();
             const res = await apiClient.post("login/", { email, password });
-
             if (res.status === 200) {
+                localStorage.setItem('user', JSON.stringify(res.data.user));
                 setTimeout(() => {
                     navigate("/dashboard/");
 
