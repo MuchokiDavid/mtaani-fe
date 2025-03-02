@@ -7,14 +7,13 @@ import About from './components/pages/About'
 import Policy from './components/pages/Policy'
 import Terms from './components/pages/Terms'
 import { Routes, Route } from 'react-router-dom';
-import NavMenu from './components/pages/components/NavMenu'
+import Dashboard from './components/pages/dash/Dashboard'
 
 function App() {
   // 
 
   return (
     <>
-      <NavMenu />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -22,6 +21,7 @@ function App() {
         <Route path="/terms" element={<Terms />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/dashboard/*" element={<Dashboard />} />
       </Routes>
     </>
   )
