@@ -1,5 +1,5 @@
 @import "tailwindcss";
 
-input{
+input, select{
   @apply p-2.5 bg-blue-50 focus:bg-white
 }
