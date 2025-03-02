@@ -1,6 +1,43 @@
 import React from 'react'
+import apiClient from '../requests/headers'
+import { useNavigate } from 'react-router-dom'
+import toast, { Toaster } from 'react-hot-toast';
 
 function Login() {
+    const [email, setEmail] = React.useState('')
+    const [password, setPassword] = React.useState('')
+    const navigate = useNavigate()
+
+    const handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
+            const res = await apiClient.post("login/", { email, password });
+
+            if (res.status === 200) {
+                setTimeout(() => {
+                    navigate("/dashboard/");
+
+                }, 200);
+            } else {
+                toast.error(res.data.message || "An unexpected error occurred.");
+            }
+        } catch (error) {
+            console.log(error);
+
+            // Extract error message properly
+            if (error.response) {
+                // Server responded with an error status (e.g., 404, 500)
+                toast.error(error.response.data.error || "Login failed. Please try again.");
+            } else if (error.request) {
+                // Request was made but no response received
+                toast.error("No response from server. Check your internet connection.");
+            } else {
+                // Something else happened
+                toast.error("An error occurred. Please try again.");
+            }
+        }
+    };
+
     return (
         <div>
             <section className="bg-white">
@@ -33,7 +70,7 @@ function Login() {
                             </h2>
 
                             <p className="mt-4 leading-relaxed text-white/90">
-                            MtaaniApp is a property maintenance ticketing system.
+                                MtaaniApp is a property maintenance ticketing system.
                             </p>
                         </div>
                     </section>
@@ -45,7 +82,7 @@ function Login() {
                             <div className="relative -mt-16 block lg:hidden">
                                 <a
                                     className="inline-flex size-16 items-center justify-center rounded-full bg-white text-blue-600 sm:size-20"
-                                    href="#"
+                                    href="/"
                                 >
                                     <span className="sr-only">Home</span>
                                     <svg
@@ -66,11 +103,11 @@ function Login() {
                                 </h1>
 
                                 <p className="mt-4 leading-relaxed text-gray-500">
-                                MtaaniApp is a property maintenance ticketing system.
+                                    MtaaniApp is a property maintenance ticketing system.
                                 </p>
                             </div>
 
-                            <form action="#" className="mt-8 grid grid-cols-6 gap-6">     
+                            <form action="#" className="mt-8 grid grid-cols-6 gap-6">
                                 <div className="col-span-6">
                                     <label htmlFor="Email" className="block text-sm font-medium text-gray-700"> Email </label>
 
@@ -78,7 +115,9 @@ function Login() {
                                         type="email"
                                         id="Email"
                                         name="email"
-                                        placeholder= "example@mail.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="example@mail.com"
                                         className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
                                     />
                                 </div>
@@ -90,13 +129,16 @@ function Login() {
                                         type="password"
                                         id="Password"
                                         name="password"
-                                        placeholder= "********"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="********"
                                         className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
                                     />
                                 </div>
 
                                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                                     <button
+                                        onClick={handleSubmit}
                                         className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:ring-3 focus:outline-hidden"
                                     >
                                         Log In
@@ -112,6 +154,10 @@ function Login() {
                     </main>
                 </div>
             </section>
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+            />
         </div>
     )
 }
