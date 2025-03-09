@@ -2,41 +2,61 @@ import React from 'react'
 import apiClient from '../requests/headers'
 import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from 'react-hot-toast';
+import { getUserByEmail } from '../database/db';
 
 function Login() {
     const [email, setEmail] = React.useState('')
     const [password, setPassword] = React.useState('')
+    const [error, setError]= React.useState(null)
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
         try {
-            e.preventDefault();
-            const res = await apiClient.post("login/", { email, password });
-            if (res.status === 200) {
-                localStorage.setItem('user', JSON.stringify(res.data.user));
+            const user = await getUserByEmail(email);
+            if (user && user.password === password) {
+                localStorage.setItem('user', JSON.stringify(user));
                 setTimeout(() => {
                     navigate("/dashboard/");
-
-                }, 200);
+                }, 2000);
             } else {
-                toast.error(res.data.message || "An unexpected error occurred.");
+                setError("Invalid email or password");
             }
         } catch (error) {
-            console.log(error);
-
-            // Extract error message properly
-            if (error.response) {
-                // Server responded with an error status (e.g., 404, 500)
-                toast.error(error.response.data.error || "Login failed. Please try again.");
-            } else if (error.request) {
-                // Request was made but no response received
-                toast.error("No response from server. Check your internet connection.");
-            } else {
-                // Something else happened
-                toast.error("An error occurred. Please try again.");
-            }
+            setError("Failed to fetch user data");
         }
     };
+
+    // const handleSubmit = async (e) => {
+    //     try {
+    //         e.preventDefault();
+    //         const res = await apiClient.post("login/", { email, password });
+    //         if (res.status === 200) {
+    //             localStorage.setItem('user', JSON.stringify(res.data.user));
+    //             setTimeout(() => {
+    //                 navigate("/dashboard/");
+
+    //             }, 200);
+    //         } else {
+    //             toast.error(res.data.message || "An unexpected error occurred.");
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+
+    //         // Extract error message properly
+    //         if (error.response) {
+    //             // Server responded with an error status (e.g., 404, 500)
+    //             toast.error(error.response.data.error || "Login failed. Please try again.");
+    //         } else if (error.request) {
+    //             // Request was made but no response received
+    //             toast.error("No response from server. Check your internet connection.");
+    //         } else {
+    //             // Something else happened
+    //             toast.error("An error occurred. Please try again.");
+    //         }
+    //     }
+    // };
 
     return (
         <div>
@@ -108,6 +128,7 @@ function Login() {
                             </div>
 
                             <form action="#" className="mt-8 grid grid-cols-6 gap-6">
+                                {error && <p className="col-span-6 text-red-500">{error}</p>}
                                 <div className="col-span-6">
                                     <label htmlFor="Email" className="block text-sm font-medium text-gray-700"> Email </label>
 
