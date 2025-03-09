@@ -17,8 +17,8 @@ function Login() {
             const user = await getUserByEmail(email);
             if (user && user.password === password) {
                 localStorage.setItem('user', JSON.stringify(user));
+                toast.success("Login successful!");
                 setTimeout(() => {
-                    toast.success("Login successful!");
                     navigate("/dashboard/");
                 }, 2000);
             } else {
