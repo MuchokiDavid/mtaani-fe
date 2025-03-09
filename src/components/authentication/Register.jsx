@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import apiClient from '../requests/headers'
+// import apiClient from '../requests/headers'
 import toast, { Toaster } from 'react-hot-toast';
+import { getAllData, addData, STORE_USERS } from '../database/db';
 
 function Register() {
-    const [first_name, setFirstName] = React.useState('')
-    const [last_name, setLastName] = React.useState('')
-    const [email, setEmail] = React.useState('')
-    const [password, setPassword] = React.useState('')
-    const [confirmPassword, setConfirmPassword] = React.useState('')
-    const [role, setRole] = React.useState('')
+    const [first_name, setFirstName] = useState('')
+    const [last_name, setLastName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [role, setRole] = useState('')
+    const [userData, setUserData] = useState(null)
     const navigate = useNavigate()
 
     const validateEmail = (email) => {
@@ -18,8 +20,20 @@ function Register() {
         );
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getAllData(STORE_USERS);
+            setUserData(data);
+        };
+        fetchData()
+    }, [])
+
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+        let i = 0
         if (password !== confirmPassword) {
             alert('Passwords do not match')
             return
@@ -28,39 +42,80 @@ function Register() {
             alert('Invalid email')
             return
         }
+
+        while (i < userData.length) {
+            if (userData[i].email === email) {
+                alert('Email already exists')
+                return
+            }
+            i++
+        }
+
         // Handle registration logic here
-        const user = {
+        const formData = {
             first_name,
             last_name,
             email,
             role,
             password
         }
-        try {
-            const res = await apiClient.post('register/', user)
-            if (res.status === 201) {
-                toast.success("Sign up successful. Redirecting to login page...");
-                setTimeout(() => {
-                    navigate("/login")
-                }, 2000);
-            }
-        } catch (error) {
-            // Extract error message properly
-            if (error.response) {
-                // Server responded with an error status (e.g., 404, 500)
-                toast.error(error.response.data.error || "Sign up failed. Please try again.");
-            } else if (error.request) {
-                // Request was made but no response received
-                toast.error("No response from server. Check your internet connection.");
-            } else {
-                // Something else happened
-                toast.error("An error occurred. Please try again.");
-            }
-            // toast.error(error?.response?.data?.message || "Sign up failed. Please try again.");
-
+        // Add new request
+        await addData(STORE_USERS, formData);
+        // Refresh the list
+        const data = await getAllData(STORE_USERS);
+        if (data) {
+            toast.success("Sign up successful. Redirecting to login page...");
+            setTimeout(() => {
+                navigate("/login")
+            }, 2000);
         }
+    };
 
-    }
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault()
+    //     if (password !== confirmPassword) {
+    //         alert('Passwords do not match')
+    //         return
+    //     }
+    //     if (!validateEmail(email)) {
+    //         alert('Invalid email')
+    //         return
+    //     }
+    //     // Handle registration logic here
+    //     const user = {
+    //         first_name,
+    //         last_name,
+    //         email,
+    //         role,
+    //         password
+    //     }
+    //     try {
+    //         const res = await apiClient.post('register/', user)
+    //         if (res.status === 201) {
+    //             toast.success("Sign up successful. Redirecting to login page...");
+    //             setTimeout(() => {
+    //                 navigate("/login")
+    //             }, 2000);
+    //         }
+    //     } catch (error) {
+    //         // Extract error message properly
+    //         if (error.response) {
+    //             // Server responded with an error status (e.g., 404, 500)
+    //             toast.error(error.response.data.error || "Sign up failed. Please try again.");
+    //         } else if (error.request) {
+    //             // Request was made but no response received
+    //             toast.error("No response from server. Check your internet connection.");
+    //         } else {
+    //             // Something else happened
+    //             toast.error("An error occurred. Please try again.");
+    //         }
+    //         // toast.error(error?.response?.data?.message || "Sign up failed. Please try again.");
+
+    //     }
+
+    // }
+
     return (
         <div>
             <section className="bg-white">
@@ -130,7 +185,7 @@ function Register() {
                                 </p>
                             </div>
 
-                            <form action="#" className="mt-8 grid grid-cols-6 gap-6">
+                            <form action="#" onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
                                 <div className="col-span-6 sm:col-span-3">
                                     <label htmlFor="FirstName" className="block text-sm font-medium text-gray-700">
                                         First Name
@@ -235,7 +290,6 @@ function Register() {
                                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                                     <button
                                         type="submit"
-                                        onClick={handleSubmit}
                                         className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:ring-3 focus:outline-hidden"
                                     >
                                         Create an account
