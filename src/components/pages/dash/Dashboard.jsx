@@ -7,6 +7,7 @@ import Rooms from "./pages/Rooms";
 import Property from "./pages/Property";
 import Maintenance from "./pages/Maintenance";
 import Profile from "./pages/Profile";
+import MaintenanceById from "./pages/MaintenanceById";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
@@ -21,6 +22,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           { to: "/dashboard/rooms", label: "Rooms" },
           { to: "/dashboard/property", label: "Property" },
           { to: "/dashboard/maintenance", label: "Maintenance" },
+
           { to: "/dashboard/profile", label: "Profile" },
         ].map((item) => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `block py-2 px-4 ${isActive ? "bg-blue-600" : "hover:bg-gray-700"}`}>{item.label}</NavLink>
@@ -66,6 +68,7 @@ export default function Dashboard() {
             <Route path="rooms" element={<Rooms />} />
             <Route path="property" element={<Property />} />
             <Route path="maintenance" element={<Maintenance />} />
+            <Route path="maintenance/:id" element={<MaintenanceById />} />
             <Route path="profile" element={<Profile />} />
           </Routes>
         </main>
