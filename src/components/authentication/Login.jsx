@@ -18,6 +18,7 @@ function Login() {
             if (user && user.password === password) {
                 localStorage.setItem('user', JSON.stringify(user));
                 setTimeout(() => {
+                    toast.success("Login successful!");
                     navigate("/dashboard/");
                 }, 2000);
             } else {
