@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Home, Wrench, CheckCircle, FileText } from "lucide-react";
+import { getAllData, STORE_MAINTENANCE } from "../../../database/db";
 
 export default function DashboardHome() {
   const [stats, setStats] = useState({
@@ -8,6 +9,16 @@ export default function DashboardHome() {
     resolvedIssues: 0,
     recentReports: [],
   });
+  const [maintenace, setMaintenance] = useState([])
+
+  useEffect(() => {
+    async function getMaintenance() {
+      setMaintenance(await getAllData(STORE_MAINTENANCE))
+    }
+    getMaintenance()
+  }, [])
+
+  console.log(maintenace)
 
   // Simulate fetching data
   useEffect(() => {
@@ -64,22 +75,34 @@ export default function DashboardHome() {
       {/* Recent Tenant Reports */}
       <div className="mt-8 bg-white shadow-lg rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">Recent Maintenance Reports</h3>
-        <ul className="space-y-3">
-          {stats.recentReports.length > 0 ? (
-            stats.recentReports.map((report, index) => (
-              <li
-                key={index}
-                className="border-b py-3 last:border-none hover:bg-gray-50 transition duration-200 ease-in-out"
-              >
-                <div className="flex items-center">
-                  <span className="text-gray-600">{report}</span>
-                </div>
-              </li>
-            ))
-          ) : (
-            <li className="text-gray-500">No recent reports</li>
-          )}
-        </ul>
+        <div className="overflow-x-auto">
+          <table className="table table-md min-w-full text-left">
+            {/* head */}
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Property</th>
+                <th>Room</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* row 1 */}
+              {maintenace.length > 0 ? (
+                maintenace.map((report, index) => (
+                  <tr>
+                    <th>{report.id}</th>
+                    <td>{report.property}</td>
+                    <td>{report.room}</td>
+                    <td>{report.description}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="text-gray-500">No recent reports</tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
