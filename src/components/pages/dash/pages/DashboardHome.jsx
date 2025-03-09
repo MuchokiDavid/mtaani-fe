@@ -76,25 +76,25 @@ export default function DashboardHome() {
       <div className="mt-8 bg-white shadow-lg rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">Recent Maintenance Reports</h3>
         <div className="overflow-x-auto">
-          <table className="table table-md min-w-full text-left">
+          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
             {/* head */}
-            <thead>
+            <thead className="ltr:text-left rtl:text-right">
               <tr>
-                <th>ID</th>
-                <th>Property</th>
-                <th>Room</th>
-                <th>Description</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">ID</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Property</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Room</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Description</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200">
               {/* row 1 */}
               {maintenace.length > 0 ? (
                 maintenace.map((report, index) => (
-                  <tr>
-                    <th>{report.id}</th>
-                    <td>{report.property}</td>
-                    <td>{report.room}</td>
-                    <td>{report.description}</td>
+                  <tr onClick={() => handleRowClick}>
+                    <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{report.id}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.property}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.room}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.description}</td>
                   </tr>
                 ))
               ) : (
