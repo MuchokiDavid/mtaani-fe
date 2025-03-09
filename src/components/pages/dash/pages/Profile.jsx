@@ -1,11 +1,15 @@
 import { useState } from "react";
+import { updateData, STORE_USERS } from "../../../database/db";
 
 export default function Profile() {
   // Mock user data (replace with API data later)
+
+  const [storageUser, setStorageUser]= useState(JSON.parse(localStorage.getItem('user')))
+
   const [user, setUser] = useState({
-    avatar: "https://via.placeholder.com/100", // Default avatar
-    name: "John Doe",
-    email: "johndoe@example.com",
+    avatar: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", // Default avatar
+    name: storageUser.first_name,
+    email: storageUser.email,
     password: "",
   });
 
@@ -15,8 +19,10 @@ export default function Profile() {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     // TODO: Send updated data to API
+    await updateData(STORE_USERS, storageUser.id, user)
     alert("Profile Updated Successfully!");
     setEditMode(false);
   };
