@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
-import {  addData, getAllData, updateData, deleteData, STORE_MAINTENANCE } from "../../../database/db";
+import { addData, getAllData, updateData, deleteData, STORE_MAINTENANCE } from "../../../database/db";
 
 export default function Maintenance() {
   const [maintenanceRequests, setMaintenanceRequests] = useState([]);
@@ -97,13 +97,12 @@ export default function Maintenance() {
                     <p className="text-sm text-gray-500 mt-2">
                       Status:{" "}
                       <span
-                        className={`font-semibold ${
-                          request.status === "Completed"
-                            ? "text-green-600"
-                            : request.status === "In Progress"
+                        className={`font-semibold ${request.status === "Completed"
+                          ? "text-green-600"
+                          : request.status === "In Progress"
                             ? "text-yellow-600"
                             : "text-red-600"
-                        }`}
+                          }`}
                       >
                         {request.status}
                       </span>
