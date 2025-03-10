@@ -1,32 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
+import { addData, getAllData, deleteData, updateData,STORE_ROOMS } from "../../../database/db";
+
+// Add room to IndexedDB
+const addRoom = async (room) => {
+  await addData(STORE_ROOMS, room)
+};
+
+// Get all rooms from IndexedDB
+const getAllRooms = async () => {
+  const db = await initDB();
+  const tx = db.transaction("rooms", "readonly");
+  const store = tx.objectStore("rooms");
+  return store.getAll();
+};
+
+// Update room in IndexedDB
+const updateRoom = async (id, updatedRoom) => {
+  await updateData(STORE_ROOMS, id, updatedRoom);
+};
+
+// Delete room from IndexedDB
+const deleteRoom = async (id) => {
+  await deleteData(STORE_ROOMS, id);
+};
 
 export default function Rooms() {
-  // Mock rooms data
-  const [rooms, setRooms] = useState([
-    {
-      id: 1,
-      roomNumber: "101",
-      property: "Sunset Apartments",
-      tenant: "John Doe",
-      status: "Occupied",
-    },
-    {
-      id: 2,
-      roomNumber: "102",
-      property: "Sunset Apartments",
-      tenant: "Jane Smith",
-      status: "Vacant",
-    },
-    {
-      id: 3,
-      roomNumber: "201",
-      property: "Ocean View Villas",
-      tenant: "Alice Johnson",
-      status: "Occupied",
-    },
-  ]);
-
+  const [rooms, setRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [formData, setFormData] = useState({
@@ -36,6 +36,15 @@ export default function Rooms() {
     status: "Vacant",
   });
 
+  // Load rooms from IndexedDB on component mount
+  useEffect(() => {
+    const fetchRooms = async () => {
+      const data = await getAllData(STORE_ROOMS);
+      setRooms(data);
+    };
+    fetchRooms();
+  }, []);
+
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,28 +52,29 @@ export default function Rooms() {
   };
 
   // Handle form submission (add/edit room)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (currentRoom) {
       // Edit existing room
-      const updatedRooms = rooms.map((room) =>
-        room.id === currentRoom.id ? { ...room, ...formData } : room
-      );
-      setRooms(updatedRooms);
+      await updateRoom(currentRoom.id, formData);
     } else {
       // Add new room
-      const newRoom = { id: Date.now(), ...formData };
-      setRooms([...rooms, newRoom]);
+      await addRoom(formData);
     }
+    // Refresh the list
+    const data = await getAllData(STORE_ROOMS);
+    setRooms(data);
     setIsModalOpen(false);
     setFormData({ roomNumber: "", property: "", tenant: "", status: "Vacant" });
     setCurrentRoom(null);
   };
 
   // Handle delete room
-  const handleDelete = (id) => {
-    const updatedRooms = rooms.filter((room) => room.id !== id);
-    setRooms(updatedRooms);
+  const handleDelete = async (id) => {
+    await deleteRoom(id);
+    // Refresh the list
+    const data = await getAllData(STORE_ROOMS);
+    setRooms(data);
   };
 
   // Open modal for adding/editing room
