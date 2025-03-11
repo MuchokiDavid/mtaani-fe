@@ -5,8 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { getAllData, addData, STORE_USERS } from '../database/db';
 
 function Register() {
-    const [first_name, setFirstName] = useState('')
-    const [last_name, setLastName] = useState('')
+    const [userName, setUserName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -53,8 +52,7 @@ function Register() {
 
         // Handle registration logic here
         const formData = {
-            first_name,
-            last_name,
+            userName,
             email,
             role,
             password
@@ -186,7 +184,7 @@ function Register() {
                             </div>
 
                             <form action="#" onSubmit={handleSubmit} className="mt-8 grid grid-cols-6 gap-6">
-                                <div className="col-span-6 sm:col-span-3">
+                                {/* <div className="col-span-6 sm:col-span-3">
                                     <label htmlFor="FirstName" className="block text-sm font-medium text-gray-700">
                                         First Name
                                     </label>
@@ -216,7 +214,21 @@ function Register() {
                                         placeholder="Last name"
                                         className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
                                     />
+                                </div> */}
+                                <div className="col-span-6">
+                                    <label htmlFor="Name" className="block text-sm font-medium text-gray-700"> Name </label>
+
+                                    <input
+                                        type="name"
+                                        id="Name"
+                                        name="name"
+                                        value={userName}
+                                        onChange={(e) => setUserName(e.target.value)}
+                                        placeholder="John Doe"
+                                        className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
+                                    />
                                 </div>
+
 
                                 <div className="col-span-6">
                                     <label htmlFor="Email" className="block text-sm font-medium text-gray-700"> Email </label>
