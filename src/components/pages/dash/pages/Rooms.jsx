@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
-import { addData, getAllData, deleteData, updateData,STORE_ROOMS } from "../../../database/db";
+import { addData, getAllData, deleteData, updateData, getDataById, STORE_ROOMS, STORE_PROPERTIES, STORE_USERS } from "../../../database/db";
 
 // Add room to IndexedDB
 const addRoom = async (room) => {
@@ -27,14 +27,18 @@ const deleteRoom = async (id) => {
 
 export default function Rooms() {
   const [rooms, setRooms] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [formData, setFormData] = useState({
     roomNumber: "",
-    property: "",
-    tenant: "",
+    property: 0,
+    tenantName: "",
+    tenantEmail: "",
+    tenantPhone: "",
     status: "Vacant",
   });
+  const [property, setProperty] = useState({})
 
   // Load rooms from IndexedDB on component mount
   useEffect(() => {
@@ -44,6 +48,15 @@ export default function Rooms() {
     };
     fetchRooms();
   }, []);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const data = await getAllData(STORE_PROPERTIES);
+      setProperties(data);
+    };
+    fetchProperties();
+  }, []);
+
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -56,9 +69,31 @@ export default function Rooms() {
     e.preventDefault();
     if (currentRoom) {
       // Edit existing room
+      if (formData.tenantEmail) {
+        const updateUserObject = {
+          name: formData.tenantName,
+          email: formData.tenantEmail,
+          phone: formData.tenantPhone,
+          role: "tenant",
+          password: "000000"
+
+        }
+        await addData(STORE_USERS, updateUserObject)
+      }
       await updateRoom(currentRoom.id, formData);
     } else {
       // Add new room
+      if (formData.tenantEmail) {
+        const userObject = {
+          name: formData.tenantName,
+          email: formData.tenantEmail,
+          phone: formData.tenantPhone,
+          role: "tenant",
+          password: "000000"
+
+        }
+        await addData(STORE_USERS, userObject)
+      }
       await addRoom(formData);
     }
     // Refresh the list
@@ -76,6 +111,15 @@ export default function Rooms() {
     const data = await getAllData(STORE_ROOMS);
     setRooms(data);
   };
+
+  // Get data by id
+  const handleDataById = async (id) => {
+    const data = await getDataById(STORE_PROPERTIES, id);
+    setProperty(data);
+    console.log(data)
+    return data
+  }
+  // console.log(property)
 
   // Open modal for adding/editing room
   const openModal = (room = null) => {
@@ -105,7 +149,7 @@ export default function Rooms() {
 
         {/* Rooms List */}
         <div className="space-y-4">
-          {rooms.length > 0 ? (
+          {rooms && rooms.length > 0 ? (
             rooms.map((room) => (
               <div
                 key={room.id}
@@ -119,17 +163,16 @@ export default function Rooms() {
                     <p className="text-gray-600 mt-2">
                       Property: {room.property}
                     </p>
-                    <p className="text-gray-600 mt-2">Tenant: {room.tenant}</p>
+                    <p className="text-gray-600 mt-2">Tenant: {room.tenantName}</p>
                     <p className="text-sm text-gray-500 mt-2">
                       Status:{" "}
                       <span
-                        className={`font-semibold ${
-                          room.status === "Occupied"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
+                        className={`font-semibold ${room.tenantEmail === ""
+                          ? "text-red-600"
+                          : "text-green-600"
+                          }`}
                       >
-                        {room.status}
+                        {room.tenantEmal == "" ? "Vacant" : "Occupied"}
                       </span>
                     </p>
                   </div>
@@ -157,64 +200,110 @@ export default function Rooms() {
 
         {/* Modal for Add/Edit Room */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-transparent backdrop-blur-xs bg-opacity-50 flex items-center justify-center p-4 shadow-lg">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 {currentRoom ? "Edit Room" : "Add Room"}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Room Number
-                  </label>
-                  <input
-                    type="text"
-                    name="roomNumber"
-                    value={formData.roomNumber}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
+                <div className="grid grid-cols-2 sm:grid-cols-1 lg:grid-cols-2 gap-2">
+                  <div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Room Number
+                      </label>
+                      <input
+                        type="text"
+                        name="roomNumber"
+                        value={formData.roomNumber}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Property
+                      </label>
+                      <select
+                        id="HeadlineAct"
+                        name="property"
+                        value={formData.property}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Please select</option>
+                        {properties && properties.length > 0 ? (
+                          properties.map((property) => (
+                            <option key={property.id} value={property.name}>
+                              {property.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="">No properties found</option>
+                        )}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Tenant Name
+                      </label>
+                      <input
+                        type="text"
+                        name="tenantName"
+                        value={formData.tenantName}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                  </div>
+
+                  <div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Tenant Email
+                      </label>
+                      <input
+                        type="email"
+                        name="tenantEmail"
+                        value={formData.tenantEmail}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                      />
+                    </div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Tenant Phone
+                    </label>
+                    <input
+                      type="text"
+                      name="tenantPhone"
+                      value={formData.tenantPhone}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Status
+                      </label>
+                      <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="Vacant">Vacant</option>
+                        <option value="Occupied">Occupied</option>
+                      </select>
+                    </div>
+
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Property
-                  </label>
-                  <input
-                    type="text"
-                    name="property"
-                    value={formData.property}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Tenant
-                  </label>
-                  <input
-                    type="text"
-                    name="tenant"
-                    value={formData.tenant}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Vacant">Vacant</option>
-                    <option value="Occupied">Occupied</option>
-                  </select>
-                </div>
+
+
                 <div className="flex justify-end gap-3">
                   <button
                     type="button"
