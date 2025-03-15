@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 input, select{
-  @apply p-2.5
+  @apply p-2.5 border border-gray-200
 }
 input :disabled{
   @apply bg-gray-100
