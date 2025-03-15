@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
 import { addData, getAllData, updateData, deleteData, STORE_PROPERTIES } from "../../../database/db";
+import storageUser from "../CurentUser";
 
 
 
@@ -23,12 +24,15 @@ export default function Property() {
   const [properties, setProperties] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProperty, setCurrentProperty] = useState(null);
+  const currentUser = storageUser
   const [formData, setFormData] = useState({
     name: "",
     location: "",
     description: "",
     isAvailable: true,
+    owner: ""
   });
+
 
   // Load properties from IndexedDB on component mount
   useEffect(() => {
@@ -43,7 +47,7 @@ export default function Property() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
-      ...formData,
+      ...formData,      
       [name]: type === "checkbox" ? checked : value,
     });
   };
@@ -51,6 +55,7 @@ export default function Property() {
   // Handle form submission (add/edit property)
   const handleSubmit = async (e) => {
     e.preventDefault();
+    formData.owner = currentUser
     if (currentProperty) {
       // Edit existing property
       await updateProperty(currentProperty.id, formData);
