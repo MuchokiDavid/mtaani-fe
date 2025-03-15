@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Home, Wrench, CheckCircle, FileText } from "lucide-react";
 import { getAllData, STORE_MAINTENANCE } from "../../../database/db";
+import { useNavigate } from "react-router-dom";
+import storageUser from "../CurentUser";
 
 export default function DashboardHome() {
   const [stats, setStats] = useState({
@@ -9,17 +11,17 @@ export default function DashboardHome() {
     resolvedIssues: 0,
     recentReports: [],
   });
-  const [maintenace, setMaintenance] = useState([])
+  const [maintenace, setMaintenance] = useState([]);
+  const currentUser = storageUser;
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getMaintenance() {
-      setMaintenance(await getAllData(STORE_MAINTENANCE))
+      setMaintenance(await getAllData(STORE_MAINTENANCE));
     }
-    getMaintenance()
-  }, [])
-
-  console.log(maintenace)
-
+    getMaintenance();
+  }, []);
+  
   // Simulate fetching data
   useEffect(() => {
     setTimeout(() => {
@@ -38,7 +40,9 @@ export default function DashboardHome() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-800">Dashboard Overview</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+        Dashboard Overview
+      </h2>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -74,31 +78,51 @@ export default function DashboardHome() {
 
       {/* Recent Tenant Reports */}
       <div className="mt-8 bg-white shadow-lg rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">Recent Maintenance Reports</h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-800">
+          Recent Maintenance Reports
+        </h3>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm">
             {/* head */}
             <thead className="ltr:text-left rtl:text-right">
               <tr>
-                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">ID</th>
-                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Property</th>
-                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Room</th>
-                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Description</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  ID
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  Property
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  Room
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  Description
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {/* row 1 */}
-              {maintenace.length > 0 ? (
+              {maintenace?.length > 0 ? (
                 maintenace.map((report, index) => (
-                  <tr onClick={() => handleRowClick}>
-                    <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">{report.id}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.property}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.room}</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">{report.description}</td>
+                  <tr key={index} onClick={() => handleRowClick}>
+                    <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                      {report.id}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                      {report.property}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                      {report.room}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                      {report.description}
+                    </td>
                   </tr>
                 ))
               ) : (
-                <tr className="text-gray-500">No recent reports</tr>
+                <tr className="text-gray-500">
+                  <td colSpan="100%">No recent reports</td>
+                </tr>
               )}
             </tbody>
           </table>
