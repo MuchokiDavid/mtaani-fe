@@ -8,8 +8,9 @@ export default function Profile() {
 
   const [user, setUser] = useState({
     avatar: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", // Default avatar
-    name: storageUser?.first_name,
+    userName: storageUser?.userName,
     email: storageUser.email,
+    role: storageUser.role,
     password: "",
   });
 
@@ -39,7 +40,7 @@ export default function Profile() {
           className="w-28 h-28 rounded-full border-4 border-blue-100 hover:border-blue-200 transition-all duration-300"
         />
         <div>
-          <h3 className="text-2xl font-semibold text-gray-800">{user.name}</h3>
+          <h3 className="text-2xl font-semibold text-gray-800">{user.userName}</h3>
           <p className="text-gray-600">{user.email}</p>
           {!editMode && (
             <button
@@ -61,8 +62,8 @@ export default function Profile() {
             </label>
             <input
               type="text"
-              name="name"
-              value={user.name}
+              name="userName"
+              value={user.userName}
               onChange={handleChange}
               className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
             />
@@ -76,8 +77,22 @@ export default function Profile() {
               type="email"
               name="email"
               value={user.email}
+              disabled
               onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              className="w-full border bg-gray-200 border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Role
+            </label>
+            <input
+              type="name"
+              name="role"
+              value={user.role}
+              disabled
+              className="w-full border bg-gray-200 border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
             />
           </div>
 
