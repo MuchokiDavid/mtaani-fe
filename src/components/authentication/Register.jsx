@@ -255,7 +255,7 @@ function Register() {
                                         className="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-xs"
                                     >
                                         <option>Select option</option>
-                                        <option value="Tenant">Tenant</option>
+                                        {/* <option value="Tenant">Tenant</option> */}
                                         <option value="Landlord">Landlord</option>
                                     </select>
                                 </div>
