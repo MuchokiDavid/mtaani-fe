@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import axios from "axios";
 import React from "react";
 import emailjs from "@emailjs/browser";
+import toast, { Toaster } from "react-hot-toast";
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -50,9 +51,13 @@ function Contact() {
       .then(
         () => {
           console.log("SUCCESS!");
+          toast.success("Message sent successfully!");
+          setFormData({ name: "", email: "", message: "" });
+          form.current.reset();
         },
         (error) => {
           console.log("FAILED...", error);
+          toast.error("Failed to send message. Please try again later.");
         }
       );
   };
@@ -103,6 +108,7 @@ function Contact() {
                     // }
                     type="text"
                     id="name"
+                    name="user_name"
                   />
                 </div>
 
@@ -116,6 +122,7 @@ function Contact() {
                     placeholder="Email address"
                     type="email"
                     id="email"
+                    name="user_email"
                     //   value={formData.email}
                     //   onChange={(e) =>
                     //     setFormData({ ...formData, email: e.target.value })
@@ -134,6 +141,7 @@ function Contact() {
                     placeholder="Message"
                     rows="8"
                     id="message"
+                    name="message"
                     // value={formData.message}
                     // onChange={(e) =>
                     //   setFormData({ ...formData, message: e.target.value })
@@ -154,6 +162,7 @@ function Contact() {
           </div>
         </div>
       </section>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }
