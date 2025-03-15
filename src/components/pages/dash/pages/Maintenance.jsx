@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
-import { addData, getAllData, updateData, deleteData, STORE_MAINTENANCE } from "../../../database/db";
+import {
+  addData,
+  getAllData,
+  updateData,
+  deleteData,
+  STORE_MAINTENANCE,
+} from "../../../database/db";
+import storageUser from "../CurentUser";
 
 export default function Maintenance() {
   const [maintenanceRequests, setMaintenanceRequests] = useState([]);
@@ -12,6 +19,7 @@ export default function Maintenance() {
     description: "",
     status: "Pending",
   });
+  const currentUser= storageUser;
 
   // Load data from IndexedDB on component mount
   useEffect(() => {
@@ -60,7 +68,12 @@ export default function Maintenance() {
     if (request) {
       setFormData(request);
     } else {
-      setFormData({ property: "", room: "", description: "", status: "Pending" });
+      setFormData({
+        property: "",
+        room: "",
+        description: "",
+        status: "Pending",
+      });
     }
     setIsModalOpen(true);
   };
@@ -70,19 +83,26 @@ export default function Maintenance() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Maintenance Requests</h1>
-          <button
-            onClick={() => openModal()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-all duration-300"
-          >
-            <Plus size={18} />
-            Add Request
-          </button>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Maintenance Requests
+          </h1>
+
+          {currentUser?.role === "Landlord" ? (
+            <p></p>
+          ) : (
+            <button
+              onClick={() => openModal()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-all duration-300"
+            >
+              <Plus size={18} />
+              Add Request
+            </button>
+          )}
         </div>
 
         {/* Maintenance Requests List */}
         <div className="space-y-4">
-          {maintenanceRequests.length > 0 ? (
+          {maintenanceRequests && maintenanceRequests.length > 0 ? (
             maintenanceRequests.map((request) => (
               <div
                 key={request.id}
@@ -97,12 +117,13 @@ export default function Maintenance() {
                     <p className="text-sm text-gray-500 mt-2">
                       Status:{" "}
                       <span
-                        className={`font-semibold ${request.status === "Completed"
-                          ? "text-green-600"
-                          : request.status === "In Progress"
+                        className={`font-semibold ${
+                          request.status === "Completed"
+                            ? "text-green-600"
+                            : request.status === "In Progress"
                             ? "text-yellow-600"
                             : "text-red-600"
-                          }`}
+                        }`}
                       >
                         {request.status}
                       </span>
@@ -215,16 +236,6 @@ export default function Maintenance() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
 
 // import { useState } from "react";
 // import { Plus, Edit, Trash } from "lucide-react";
