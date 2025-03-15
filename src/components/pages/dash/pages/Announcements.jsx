@@ -1,23 +1,83 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash } from "lucide-react";
-import { getAllData, updateData, addData, deleteData, STORE_ANNOUNCEMENTS } from "../../../database/db";
-
+import {
+  getAllData,
+  updateData,
+  addData,
+  deleteData,
+  STORE_ANNOUNCEMENTS,
+  STORE_PROPERTIES,
+} from "../../../database/db";
+import storageUser from "../CurentUser";
 
 // Delete announcement from IndexedDB
 const deleteAnnouncement = async (id) => {
-  await deleteData(STORE_ANNOUNCEMENTS, id)
+  await deleteData(STORE_ANNOUNCEMENTS, id);
 };
 
-export default function Announcement() {
-  const [announcements, setAnnouncements] = useState([]);
+export default function Announcement({ homeannouncements, homerooms }) {
+  const [announcements, setAnnouncements] = useState(homeannouncements);
+  const [properties, setProperty] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentAnnouncement, setCurrentAnnouncement] = useState(null);
-  const [formData, setFormData] = useState({ title: "", description: "", date: "" });
+  const [formData, setFormData] = useState({
+    title: "",
+    property: "",
+    description: "",
+    date: "",
+  });
+  const currentUser = storageUser;
+  const navigate = useNavigate();
 
-  // Load announcements from IndexedDB on component mount
+  const getRoom = () => {
+    let room = homerooms.find(
+      (room) => room.tenantEmail === currentUser["email"]
+    );
+    if (!room) {
+      room = homerooms.find(
+        (room) => room.tenantEmail === currentUser["email"]
+      );
+    }
+    // console.log(room)
+    return room;
+  };
+
+  // Get all property for a landlord
+  const getProperties = async () => {
+    const data = await getAllData(STORE_PROPERTIES);
+    return data.filter(
+      (property) => property['owner']['email'] === currentUser["email"]
+    );
+  };
+
+  // Load IndexedDB on component mount
+  useEffect(() => {
+    const fetchProperty = async () => {
+      const data = await getAllData(STORE_PROPERTIES);
+      setProperty(data);
+    };
+    fetchProperty();
+  }, []);
+
   useEffect(() => {
     const fetchAnnouncements = async () => {
-      const data = await getAllData(STORE_ANNOUNCEMENTS);
+      let data = await getAllData(STORE_ANNOUNCEMENTS);
+      let room = getRoom();
+      if (currentUser.role === "tenant") {
+        data = data.filter(
+          (announcement) => announcement['property'] === room["property"]
+        );
+      } else {
+        data = data.filter(
+          async (announcement) =>{
+            let allProperties= await getProperties()
+            data= allProperties.find(
+              (property) => property['name'] === announcement['property'])
+          }
+        );
+      }
+      console.log(data)
       setAnnouncements(data);
     };
     fetchAnnouncements();
@@ -35,9 +95,7 @@ export default function Announcement() {
     if (currentAnnouncement) {
       // Edit existing announcement
       updateData(STORE_ANNOUNCEMENTS, currentAnnouncement.id, formData);
-    }
-
-    else {
+    } else {
       await addData(STORE_ANNOUNCEMENTS, formData);
     }
     // Refresh the list
@@ -47,6 +105,8 @@ export default function Announcement() {
     setFormData({ title: "", description: "", date: "" });
     setCurrentAnnouncement(null);
   };
+
+  const getRoomFromUser = (email = currentUser.email) => {};
 
   // Handle delete announcement
   const handleDelete = async (id) => {
@@ -73,28 +133,39 @@ export default function Announcement() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Announcements</h1>
-          <button
-            onClick={() => openModal()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-all duration-300"
-          >
-            <Plus size={18} />
-            Add Announcement
-          </button>
+          {currentUser?.role === "tenant" ? (
+            <p></p>
+          ) : (
+            <button
+              onClick={() => openModal()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-all duration-300"
+            >
+              <Plus size={18} />
+              Add Announcement
+            </button>
+          )}
         </div>
 
         {/* Announcements List */}
         <div className="space-y-4">
           {announcements && announcements.length > 0 ? (
-            announcements && announcements.map((announcement) => (
+            announcements &&
+            announcements.map((announcement) => (
               <div
                 key={announcement.id}
                 className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-800">{announcement.title}</h3>
-                    <p className="text-gray-600 mt-2">{announcement.description}</p>
-                    <p className="text-sm text-gray-500 mt-2">Date: {announcement.date}</p>
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {announcement.title}
+                    </h3>
+                    <p className="text-gray-600 mt-2">
+                      {announcement.description}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Date: {announcement.date}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -120,14 +191,16 @@ export default function Announcement() {
 
         {/* Modal for Add/Edit Announcement */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-transparent backdrop-blur-xs bg-opacity-50 flex items-center justify-center p-4 shadow-lg min-w-4xl">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-bold text-gray-800 mb-4">
                 {currentAnnouncement ? "Edit Announcement" : "Add Announcement"}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Title</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Title
+                  </label>
                   <input
                     type="text"
                     name="title"
@@ -137,8 +210,35 @@ export default function Announcement() {
                     required
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Description</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Property
+                  </label>
+                  <select
+                    id="HeadlineAct"
+                    name="property"
+                    value={formData.property}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Please select</option>
+                    {properties && properties.length > 0 ? (
+                      properties.map((property) => (
+                        <option key={property.id} value={property.name}>
+                          {property.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">No properties found</option>
+                    )}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Description
+                  </label>
                   <textarea
                     name="description"
                     value={formData.description}
@@ -149,7 +249,9 @@ export default function Announcement() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Date</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Date
+                  </label>
                   <input
                     type="date"
                     name="date"
@@ -182,7 +284,6 @@ export default function Announcement() {
     </div>
   );
 }
-
 
 // import { useState, useEffect } from "react";
 // import { Plus, Edit, Trash } from "lucide-react";
