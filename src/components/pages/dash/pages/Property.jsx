@@ -30,7 +30,7 @@ export default function Property() {
     location: "",
     description: "",
     isAvailable: true,
-    owner: ""
+    owner: storageUser
   });
 
 
