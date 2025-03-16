@@ -77,7 +77,7 @@ export default function Rooms() {
     e.preventDefault();
     if (currentRoom) {
       // Edit existing room
-      const updated_room= await updateRoom(currentRoom.id, formData);
+      let updated_room= await updateRoom(currentRoom.id, formData);
       if (updated_room) {
         const userObject = {
           userName: formData.tenantName,
@@ -103,7 +103,6 @@ export default function Rooms() {
       }
       await addRoom(formData);
     }
-    console.log(formData);
     // Refresh the list
     const data = await getAllData(STORE_ROOMS);
     setRooms(data);
