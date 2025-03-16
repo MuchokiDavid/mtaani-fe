@@ -15,43 +15,58 @@ const STORE_ANNOUNCEMENTS = "announcements";
 
 // Function to initialize the database
 const initDB = async () => {
-    return openDB(DB_NAME, DB_VERSION, {
-        upgrade(db) {
-            // Create object stores if they don't exist
-            if (!db.objectStoreNames.contains(STORE_MAINTENANCE)) {
-                db.createObjectStore(STORE_MAINTENANCE, { keyPath: "id", autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains(STORE_PROPERTIES)) {
-                db.createObjectStore(STORE_PROPERTIES, { keyPath: "id", autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains(STORE_ROOMS)) {
-                db.createObjectStore(STORE_ROOMS, { keyPath: "id", autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains(STORE_USERS)) {
-                // Create the 'users' object store
-                const store = db.createObjectStore(STORE_USERS, {
-                    keyPath: "id",
-                    autoIncrement: true,
-                });
-                // Create an index on the 'email' field
-                store.createIndex("email", "email", { unique: true });
-            } else {
-                // If the 'users' object store already exists, ensure the 'email' index exists
-                const tx = db.transaction(STORE_USERS, "readwrite");
-                const store = tx.objectStore(STORE_USERS);
-                if (!store.indexNames.contains("email")) {
-                    store.createIndex("email", "email", { unique: true });
-                }
-                tx.done;
-            }
-            if (!db.objectStoreNames.contains(STORE_BOOKINGS)) {
-                db.createObjectStore(STORE_BOOKINGS, { keyPath: "id", autoIncrement: true });
-            }
-            if (!db.objectStoreNames.contains(STORE_ANNOUNCEMENTS)) {
-                db.createObjectStore(STORE_ANNOUNCEMENTS, { keyPath: "id", autoIncrement: true });
-            }
-        },
-    });
+  return openDB(DB_NAME, DB_VERSION, {
+    upgrade(db) {
+      // Create object stores if they don't exist
+      if (!db.objectStoreNames.contains(STORE_MAINTENANCE)) {
+        db.createObjectStore(STORE_MAINTENANCE, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+      if (!db.objectStoreNames.contains(STORE_PROPERTIES)) {
+        db.createObjectStore(STORE_PROPERTIES, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+      if (!db.objectStoreNames.contains(STORE_ROOMS)) {
+        db.createObjectStore(STORE_ROOMS, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+      if (!db.objectStoreNames.contains(STORE_USERS)) {
+        // Create the 'users' object store
+        const store = db.createObjectStore(STORE_USERS, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+        // Create an index on the 'email' field
+        store.createIndex("email", "email", { unique: true });
+      } else {
+        // If the 'users' object store already exists, ensure the 'email' index exists
+        const tx = db.transaction(STORE_USERS, "readwrite");
+        const store = tx.objectStore(STORE_USERS);
+        if (!store.indexNames.contains("email")) {
+          store.createIndex("email", "email", { unique: true });
+        }
+        tx.done;
+      }
+      if (!db.objectStoreNames.contains(STORE_BOOKINGS)) {
+        db.createObjectStore(STORE_BOOKINGS, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+      if (!db.objectStoreNames.contains(STORE_ANNOUNCEMENTS)) {
+        db.createObjectStore(STORE_ANNOUNCEMENTS, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
+    },
+  });
 };
 // const initDB = async () => {
 //   return openDB(DB_NAME, DB_VERSION, {
