@@ -77,17 +77,18 @@ export default function Rooms() {
     e.preventDefault();
     if (currentRoom) {
       // Edit existing room
-      if (formData.tenantEmail) {
-        const updateUserObject = {
+      const updated_room= await updateRoom(currentRoom.id, formData);
+      if (updated_room) {
+        const userObject = {
           userName: formData.tenantName,
           email: formData.tenantEmail,
           phone: formData.tenantPhone,
           role: "tenant",
           password: "000000",
         };
-        await addData(STORE_USERS, updateUserObject);
+        await addData(STORE_USERS, userObject);
       }
-      await updateRoom(currentRoom.id, formData);
+      
     } else {
       // Add new room
       if (formData.tenantEmail) {
