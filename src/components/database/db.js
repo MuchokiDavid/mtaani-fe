@@ -24,6 +24,15 @@ const initDB = async () => {
           autoIncrement: true,
         });
       }
+      // if (!db.objectStoreNames.contains(STORE_MAINTENANCE)) {
+      //   const maintenanceStore = db.createObjectStore(STORE_MAINTENANCE, {
+      //     keyPath: "id",
+      //     autoIncrement: true,
+      //   });
+      //   maintenanceStore.createIndex("landlordId", "landlordId", {
+      //     unique: false,
+      //   });
+      // }
       if (!db.objectStoreNames.contains(STORE_PROPERTIES)) {
         db.createObjectStore(STORE_PROPERTIES, {
           keyPath: "id",
@@ -68,76 +77,6 @@ const initDB = async () => {
     },
   });
 };
-// const initDB = async () => {
-//   return openDB(DB_NAME, DB_VERSION, {
-//     upgrade(db) {
-//       // Create object stores if they don't exist
-//       if (!db.objectStoreNames.contains(STORE_MAINTENANCE)) {
-//         const maintenanceStore = db.createObjectStore(STORE_MAINTENANCE, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//         // Create an index on the 'roomId' field to establish a relationship with rooms
-//         maintenanceStore.createIndex("roomId", "roomId", { unique: false });
-//       }
-//       if (!db.objectStoreNames.contains(STORE_PROPERTIES)) {
-//         const propertiesStore = db.createObjectStore(STORE_PROPERTIES, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//         // Create an index on the 'landlordId' field to establish a relationship with users (landlords)
-//         propertiesStore.createIndex("landlordId", "landlordId", {
-//           unique: false,
-//         });
-//       }
-//       if (!db.objectStoreNames.contains(STORE_ROOMS)) {
-//         const roomsStore = db.createObjectStore(STORE_ROOMS, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//         // Create an index on the 'propertyId' field to establish a relationship with properties
-//         roomsStore.createIndex("propertyId", "propertyId", { unique: false });
-//       }
-//       if (!db.objectStoreNames.contains(STORE_USERS)) {
-//         const usersStore = db.createObjectStore(STORE_USERS, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//         // Create an index on the 'email' field
-//         usersStore.createIndex("email", "email", { unique: true });
-//         // Create an index on the 'roomId' field to establish a relationship with rooms (for tenants)
-//         usersStore.createIndex("roomId", "roomId", { unique: true }); // Ensure one tenant per room
-//       } else {
-//         // If the 'users' object store already exists, ensure the 'email' and 'roomId' indices exist
-//         const tx = db.transaction(STORE_USERS, "readwrite");
-//         const store = tx.objectStore(STORE_USERS);
-//         if (!store.indexNames.contains("email")) {
-//           store.createIndex("email", "email", { unique: true });
-//         }
-//         if (!store.indexNames.contains("roomId")) {
-//           store.createIndex("roomId", "roomId", { unique: true }); // Ensure one tenant per room
-//         }
-//         tx.done;
-//       }
-//       if (!db.objectStoreNames.contains(STORE_BOOKINGS)) {
-//         db.createObjectStore(STORE_BOOKINGS, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//       }
-//       if (!db.objectStoreNames.contains(STORE_ANNOUNCEMENTS)) {
-//         const announcementsStore = db.createObjectStore(STORE_ANNOUNCEMENTS, {
-//           keyPath: "id",
-//           autoIncrement: true,
-//         });
-//         // Create an index on the 'landlordId' field to establish a relationship with users (landlords)
-//         announcementsStore.createIndex("landlordId", "landlordId", {
-//           unique: false,
-//         });
-//       }
-//     },
-//   });
-// };
 
 // Function to add data to an object store
 const addData = async (storeName, data) => {
@@ -210,3 +149,74 @@ export {
   STORE_BOOKINGS,
   STORE_ANNOUNCEMENTS,
 };
+
+// const initDB = async () => {
+//   return openDB(DB_NAME, DB_VERSION, {
+//     upgrade(db) {
+//       // Create object stores if they don't exist
+//       if (!db.objectStoreNames.contains(STORE_MAINTENANCE)) {
+//         const maintenanceStore = db.createObjectStore(STORE_MAINTENANCE, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//         // Create an index on the 'roomId' field to establish a relationship with rooms
+//         maintenanceStore.createIndex("roomId", "roomId", { unique: false });
+//       }
+//       if (!db.objectStoreNames.contains(STORE_PROPERTIES)) {
+//         const propertiesStore = db.createObjectStore(STORE_PROPERTIES, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//         // Create an index on the 'landlordId' field to establish a relationship with users (landlords)
+//         propertiesStore.createIndex("landlordId", "landlordId", {
+//           unique: false,
+//         });
+//       }
+//       if (!db.objectStoreNames.contains(STORE_ROOMS)) {
+//         const roomsStore = db.createObjectStore(STORE_ROOMS, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//         // Create an index on the 'propertyId' field to establish a relationship with properties
+//         roomsStore.createIndex("propertyId", "propertyId", { unique: false });
+//       }
+//       if (!db.objectStoreNames.contains(STORE_USERS)) {
+//         const usersStore = db.createObjectStore(STORE_USERS, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//         // Create an index on the 'email' field
+//         usersStore.createIndex("email", "email", { unique: true });
+//         // Create an index on the 'roomId' field to establish a relationship with rooms (for tenants)
+//         usersStore.createIndex("roomId", "roomId", { unique: true }); // Ensure one tenant per room
+//       } else {
+//         // If the 'users' object store already exists, ensure the 'email' and 'roomId' indices exist
+//         const tx = db.transaction(STORE_USERS, "readwrite");
+//         const store = tx.objectStore(STORE_USERS);
+//         if (!store.indexNames.contains("email")) {
+//           store.createIndex("email", "email", { unique: true });
+//         }
+//         if (!store.indexNames.contains("roomId")) {
+//           store.createIndex("roomId", "roomId", { unique: true }); // Ensure one tenant per room
+//         }
+//         tx.done;
+//       }
+//       if (!db.objectStoreNames.contains(STORE_BOOKINGS)) {
+//         db.createObjectStore(STORE_BOOKINGS, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//       }
+//       if (!db.objectStoreNames.contains(STORE_ANNOUNCEMENTS)) {
+//         const announcementsStore = db.createObjectStore(STORE_ANNOUNCEMENTS, {
+//           keyPath: "id",
+//           autoIncrement: true,
+//         });
+//         // Create an index on the 'landlordId' field to establish a relationship with users (landlords)
+//         announcementsStore.createIndex("landlordId", "landlordId", {
+//           unique: false,
+//         });
+//       }
+//     },
+//   });
+// };
