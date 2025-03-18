@@ -182,12 +182,12 @@ export default function Rooms() {
                       Status:{" "}
                       <span
                         className={`font-semibold ${
-                          room.tenantEmail === ""
-                            ? "text-red-600"
-                            : "text-green-600"
+                          room.tenantEmail
+                            ? "text-green-600"
+                            : "text-red-600"
                         }`}
                       >
-                        {room.tenantEmal == "" ? "Vacant" : "Occupied"}
+                        {room.tenantEmail ? "Occupied" : "Vacant"}
                       </span>
                     </p>
                   </div>
