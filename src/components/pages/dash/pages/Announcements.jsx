@@ -38,7 +38,9 @@ export default function Announcement({ homeannouncements, homerooms }) {
   // Get all properties owned by the current landlord
   const getLandlordProperties = async () => {
     const data = await getAllData(STORE_PROPERTIES);
-    return data.filter((property) => property.owner.email === currentUser.email);
+    return data.filter(
+      (property) => property.owner.email === currentUser.email
+    );
   };
 
   // Fetch properties on component mount
@@ -79,6 +81,13 @@ export default function Announcement({ homeannouncements, homerooms }) {
 
     fetchAnnouncements();
   }, [currentUser, homerooms]);
+
+  useEffect(() => {
+    function refreshPage() {
+      window.location.reload();
+    }
+    const intervalId = setInterval(refreshPage, 3000);
+  }, []);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -130,9 +139,7 @@ export default function Announcement({ homeannouncements, homerooms }) {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Announcements</h1>
-          {currentUser?.role === "tenant" ? (
-            null
-          ) : (
+          {currentUser?.role === "tenant" ? null : (
             <button
               onClick={() => openModal()}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-all duration-300"
