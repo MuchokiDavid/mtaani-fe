@@ -78,7 +78,7 @@ export default function Rooms() {
     e.preventDefault();
     if (currentRoom) {
       // Edit existing room
-      let updated_room= await updateRoom(currentRoom.id, formData);
+      let updated_room = await updateRoom(currentRoom.id, formData);
       if (updated_room) {
         const userObject = {
           userName: formData.tenantName,
@@ -89,7 +89,6 @@ export default function Rooms() {
         };
         await addData(STORE_USERS, userObject);
       }
-      
     } else {
       // Add new room
       if (formData.tenantEmail) {
@@ -145,12 +144,17 @@ export default function Rooms() {
     setIsModalOpen(true);
   };
 
-  const handleRemoveTenant= ()=> {
+  const handleRemoveTenant = () => {
     // console.log("remove tenant")
-    setFormData({ ...formData, tenantName: "", tenantEmail: "", tenantPhone: "" });
-    toast.success('Save to remove');
-  }
- 
+    setFormData({
+      ...formData,
+      tenantName: "",
+      tenantEmail: "",
+      tenantPhone: "",
+    });
+    toast.success("Save to remove");
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
@@ -189,9 +193,7 @@ export default function Rooms() {
                       Status:{" "}
                       <span
                         className={`font-semibold ${
-                          room.tenantEmail
-                            ? "text-green-600"
-                            : "text-red-600"
+                          room.tenantEmail ? "text-green-600" : "text-red-600"
                         }`}
                       >
                         {room.tenantEmail ? "Occupied" : "Vacant"}
@@ -349,10 +351,7 @@ export default function Rooms() {
           </div>
         )}
       </div>
-      <Toaster
-  position="top-center"
-  reverseOrder={false}
-/>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }
