@@ -10,6 +10,7 @@ import {
   STORE_PROPERTIES,
   STORE_USERS,
 } from "../../../database/db";
+import toast, { Toaster } from "react-hot-toast";
 
 // Add room to IndexedDB
 const addRoom = async (room) => {
@@ -144,6 +145,12 @@ export default function Rooms() {
     setIsModalOpen(true);
   };
 
+  const handleRemoveTenant= ()=> {
+    // console.log("remove tenant")
+    setFormData({ ...formData, tenantName: "", tenantEmail: "", tenantPhone: "" });
+    toast.success('Save to remove');
+  }
+ 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
@@ -321,6 +328,15 @@ export default function Rooms() {
                   >
                     Cancel
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={handleRemoveTenant}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300"
+                  >
+                    Remove Tenant
+                  </button>
+
                   <button
                     type="submit"
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300"
@@ -333,6 +349,10 @@ export default function Rooms() {
           </div>
         )}
       </div>
+      <Toaster
+  position="top-center"
+  reverseOrder={false}
+/>
     </div>
   );
 }
